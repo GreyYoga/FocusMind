@@ -2,6 +2,7 @@
   "name": "Личный Секретарь",
   "short_name": "Секретарь",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0d0f2b",
   "theme_color": "#1d1a3f",
