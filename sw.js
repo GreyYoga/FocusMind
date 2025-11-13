@@ -1,4 +1,4 @@
-const CACHE_NAME = 'secretary-v1';
+const CACHE_NAME = 'secretary-v3'; // ОБЯЗАТЕЛЬНО МЕНЯЕМ ВЕРСИЮ
 const ASSETS = [
   './',
   './index.html',
@@ -10,8 +10,11 @@ const ASSETS = [
   './icon-512.png'
 ];
 
-// Установка SW и кэширование файлов
+// 1. Установка SW
 self.addEventListener('install', (e) => {
+  // Эта строка заставляет новый SW активироваться немедленно, не ожидая закрытия вкладок
+  self.skipWaiting(); 
+  
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS);
@@ -19,7 +22,7 @@ self.addEventListener('install', (e) => {
   );
 });
 
-// Активация и очистка старого кэша
+// 2. Активация
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
@@ -30,11 +33,14 @@ self.addEventListener('activate', (e) => {
           }
         })
       );
+    }).then(() => {
+      // Эта строка заставляет SW начать контролировать все открытые вкладки СРАЗУ ЖЕ
+      return self.clients.claim();
     })
   );
 });
 
-// Перехват запросов (Сначала ищем в кэше, если нет — в сеть)
+// 3. Перехват запросов
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then((response) => {

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,12 +10,15 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
 </head>
+
 <body>
 
     <div class="container">
-        
+
         <div id="inbox-screen" class="screen">
-            <div class="screen-header"><h2>🗃️ Инбокс (Необработанные)</h2></div>
+            <div class="screen-header">
+                <h2>🗃️ Инбокс (Необработанные)</h2>
+            </div>
             <div class="screen-content">
                 <form id="add-task-form-inbox">
                     <input type="text" id="new-task-input" placeholder="Собрать... Позвонить... Написать..." required>
@@ -24,9 +28,11 @@
                 <ul id="inbox-list" class="task-list-container"></ul>
             </div>
         </div>
-        
+
         <div id="plan-screen" class="screen">
-            <div class="screen-header"><h2>📋 План (Задачи с датой)</h2></div>
+            <div class="screen-header">
+                <h2>📋 План (Задачи с датой)</h2>
+            </div>
             <div class="screen-content">
                 <h3>Задачи с установленной датой:</h3>
                 <ul id="plan-list" class="task-list-container"></ul>
@@ -34,7 +40,9 @@
         </div>
 
         <div id="calendar-screen" class="screen">
-            <div class="screen-header"><h2>📅 Календарь</h2></div>
+            <div class="screen-header">
+                <h2>📅 Календарь</h2>
+            </div>
             <div class="screen-content">
                 <div id="calendar-header">
                     <button id="prev-month-btn" class="secondary-btn">&lt;</button>
@@ -42,9 +50,12 @@
                     <button id="next-month-btn" class="secondary-btn">&gt;</button>
                 </div>
                 <div id="calendar-grid-header" class="calendar-grid">
-                    <div class="calendar-day-name">Пн</div> <div class="calendar-day-name">Вт</div>
-                    <div class="calendar-day-name">Ср</div> <div class="calendar-day-name">Чт</div>
-                    <div class="calendar-day-name">Пт</div> <div class="calendar-day-name">Сб</div>
+                    <div class="calendar-day-name">Пн</div>
+                    <div class="calendar-day-name">Вт</div>
+                    <div class="calendar-day-name">Ср</div>
+                    <div class="calendar-day-name">Чт</div>
+                    <div class="calendar-day-name">Пт</div>
+                    <div class="calendar-day-name">Сб</div>
                     <div class="calendar-day-name">Вс</div>
                 </div>
                 <div id="calendar-grid" class="calendar-grid"></div>
@@ -55,7 +66,9 @@
         </div>
 
         <div id="wizard-screen" class="screen">
-            <div class="screen-header"><h2>✨ Очистка Мозга</h2></div>
+            <div class="screen-header">
+                <h2>✨ Очистка Мозга</h2>
+            </div>
             <div class="screen-content">
                 <div id="wizard-header">
                     <h2 id="category-title">Категория</h2>
@@ -81,7 +94,9 @@
         </div>
 
         <div id="focus-screen" class="screen">
-            <div class="screen-header"><h2>⏱️ Фокус (Pomodoro)</h2></div>
+            <div class="screen-header">
+                <h2>⏱️ Фокус (Pomodoro)</h2>
+            </div>
             <div class="screen-content">
                 <div id="timer-container">
                     <div id="timer-mode-buttons">
@@ -106,9 +121,9 @@
                 <button id="test-notif-btn" style="margin-top:20px; background:#444;">🔔 Тест уведомления</button>
             </div>
         </div>
-        
+
     </div>
-    
+
     <nav class="footer-nav">
         <button id="nav-inbox" class="nav-btn active">
             <span class="icon">🗃️</span>
@@ -135,15 +150,26 @@
     <audio id="alarm-sound" src="alarm.mp3" preload="auto"></audio>
 
     <script src="app.js"></script>
-    
+
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker зарегистрирован', reg))
-                    .catch(err => console.log('Ошибка SW:', err));
+                    .then(reg => {
+                        console.log('SW зарегистрирован:', reg);
+                        // Если это первое посещение, SW может быть еще "installing"
+                        // Но благодаря clients.claim() в sw.js он скоро станет активным
+                    })
+                    .catch(err => {
+                        // ВЫВОДИМ ОШИБКУ НА ЭКРАН ТЕЛЕФОНА
+                        alert('❌ Ошибка регистрации SW: ' + err);
+                        console.log('Ошибка SW:', err);
+                    });
             });
+        } else {
+            alert('❌ Ваш браузер не поддерживает Service Workers!');
         }
     </script>
 </body>
+
 </html>
