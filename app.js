@@ -670,47 +670,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('test-notif-btn').onclick = () => {
-        // 1. Проверка поддержки
-        if (!('serviceWorker' in navigator)) {
-            alert("❌ Браузер не поддерживает Service Worker!");
-            return;
-        }
-        if (!('Notification' in window)) {
-            alert("❌ Браузер не поддерживает уведомления!");
-            return;
-        }
-
-        // 2. Запрос прав
-        Notification.requestPermission().then(perm => {
-            if (perm !== 'granted') {
-                alert("🔒 Права на уведомления не даны (статус: " + perm + ")");
-                return;
-            }
-
-            alert("✅ Права есть. Ждем Service Worker...");
-
-            // 3. МАГИЯ: Мы не проверяем controller, мы просто ждем, пока SW будет ГОТОВ.
-            navigator.serviceWorker.ready.then(registration => {
-                alert("⚙️ SW готов! Отправляем...");
-
-                registration.showNotification("🔔 Победа!", {
-                    body: "Уведомления через Service Worker работают!",
-                    icon: 'icon-192.png',
-                    vibrate: [200, 100, 200],
-                    tag: 'test-notification'
-                })
-                    .then(() => {
-                        // Воспроизводим звук для проверки
-                        const audio = document.getElementById('alarm-sound');
-                        if (audio) audio.play().catch(e => console.log("Звук не сработал (нужен тап)"));
-                    })
-                    .catch(err => alert("❌ Ошибка внутри showNotification: " + err));
-
-            }).catch(err => {
-                alert("❌ Ошибка ожидания SW (ready): " + err);
-                console.error(err);
+        // 1. Проверка прав
+        if (Notification.permission !== 'granted') {
+            Notification.requestPermission().then(p => {
+                if (p !== 'granted') alert("❌ Нет прав на уведомления!");
             });
-        });
+            return;
+        }
+
+        alert("🧹 Начинаем полную переустановку SW...");
+
+        // 2. СНАЧАЛА УБИВАЕМ ВСЕ СТАРЫЕ ВОРКЕРЫ
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            for (let registration of registrations) {
+                registration.unregister();
+            }
+            // alert("🗑️ Старый SW удален.");
+
+            // 3. РЕГИСТРИРУЕМ ЗАНОВО
+            return navigator.serviceWorker.register('./sw.js');
+        })
+            .then(registration => {
+                alert("✅ SW зарегистрирован заново! Ждем активации...");
+
+                // Ждем пока он станет активным
+                return navigator.serviceWorker.ready;
+            })
+            .then(registration => {
+                alert("🚀 SW ГОТОВ! Отправляем...");
+
+                registration.showNotification("🔔 ФИНАЛЬНЫЙ ТЕСТ", {
+                    body: "Если ты это видишь — мы победили!",
+                    icon: 'icon-192.png',
+                    vibrate: [200, 100, 200]
+                });
+            })
+            .catch(error => {
+                // САМОЕ ВАЖНОЕ: Если файла нет или в нем ошибка, мы увидим это здесь
+                alert("❌ КРИТИЧЕСКАЯ ОШИБКА: " + error);
+                console.error(error);
+            });
     };
 
 });
