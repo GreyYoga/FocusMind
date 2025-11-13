@@ -7,12 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // let nextTaskId = 1; // (УДАЛЕНО: IndexedDB сама генерирует ID)
     let currentDate = new Date();
     const todayStr = new Date().toISOString().slice(0, 10);
-    
+
     // Переменные для базы данных
     let db;
     const DB_NAME = 'SecretaryDB';
     const STORE_NAME = 'tasks';
-    
+
     // Состояние Таймера
     const timerModes = {
         pomodoro: 25 * 60,
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         triggersList: document.getElementById('triggers-list'),
         form: document.getElementById('wizard-task-form'),
         taskInput: document.getElementById('wizard-task-input'),
-        taskDate: document.getElementById('wizard-task-datetime'), 
+        taskDate: document.getElementById('wizard-task-datetime'),
         stepTasksList: document.getElementById('wizard-step-tasks'),
         stepCounter: document.getElementById('step-counter'),
         prevBtn: document.getElementById('prev-btn'),
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- 3. INDEXED DB (База данных) ---
-    
+
     function initDB() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open(DB_NAME, 1);
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addTaskToDB(task) {
         // Удаляем ID перед добавлением, чтобы DB сама его создала
-        const { id, ...taskWithoutId } = task; 
+        const { id, ...taskWithoutId } = task;
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
         const request = store.add(taskWithoutId);
@@ -158,13 +158,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
         store.delete(id);
-        
+
         allTasks = allTasks.filter(t => t.id !== id);
         renderAllLists();
     }
 
     // --- 4. УВЕДОМЛЕНИЯ (Notifications API) ---
-    
+
     function requestNotificationPermission() {
         if ('Notification' in window && Notification.permission !== 'granted') {
             Notification.requestPermission();
@@ -175,13 +175,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if ('Notification' in window && Notification.permission === 'granted') {
             // Проверка для мобильных устройств - используем ServiceWorker регистрацию если доступна
             if (navigator.serviceWorker.controller) {
-                 navigator.serviceWorker.ready.then(registration => {
-                     registration.showNotification(title, {
-                         body: body,
-                         icon: 'icon-192.png',
-                         vibrate: [200, 100, 200]
-                     });
-                 });
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification(title, {
+                        body: body,
+                        icon: 'icon-192.png',
+                        vibrate: [200, 100, 200]
+                    });
+                });
             } else {
                 // Фолбэк для десктопа
                 new Notification(title, { body: body, icon: 'icon-192.png' });
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 5. Вспомогательные Функции ---
-    
+
     function createPrioritySelect(selectedPriority = "4") {
         const prioritySelect = document.createElement('select');
         prioritySelect.className = 'priority-select';
@@ -205,55 +205,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initializeWizardData() {
-         // (Используем полные данные из прошлых версий, сокращено для краткости)
+        // (Используем полные данные из прошлых версий, сокращено для краткости)
         const data = [
-                  { 
-                    "category": "Учеба", 
-                    "subcategories": [
-                      { "name": "Домашнее задание", "triggers": ["Сделать", "Проверить", "Списать", "Передать"] },
-                      { "name": "Лекции / семинары", "triggers": ["Взять конспект", "Записаться"] },
-                      { "name": "Экзамены / зачеты", "triggers": ["Список вопросов", "Список литературы", "подготовиться"] },
-                      { "name": "Диплом / Курсовая", "triggers": ["Тема", "Рецензент", "Научрук"] },
-                      { "name": "Статьи / Конференции", "triggers": ["предложения", "встречи"] },
-                      { "name": "Практика", "triggers": ["-"] }
-                    ]
-                  },
-                  { 
-                    "category": "Работа", 
-                    "subcategories": [
-                      { "name": "Проекты", "triggers": ["начатые проекты", "проекты, которые надо начать", "проекты, которые хорошо бы начать"] },
-                      { "name": "Обещания (Работа)", "triggers": ["начальник", "партнеры", "коллеги", "подчиненные", "клиенты"] },
-                      { "name": "Документы", "triggers": ["отчеты / таймшиты", "оценки", "обзоры", "редактирование", "вычитка"] },
-                      { "name": "Ожидания (Работа)", "triggers": ["информация", "проектные мероприятия", "ответы", "письма", "звонки"] },
-                      { "name": "Проф. рост", "triggers": ["обучение", "семинары", "ориентиры", "чему стоит поучиться", "нужные навыки"] },
-                      { "name": "Исследования", "triggers": ["-"] },
-                      { "name": "Профессиональный гардероб", "triggers": ["-"] }
-                    ]
-                  },
-                  { 
-                    "category": "Личное", 
-                    "subcategories": [
-                      { "name": "Обещания (Личные)", "triggers": ["жене/мужу", "детям", "родителям", "друзьям", "родственникам"] },
-                      { "name": "Коммуникации", "triggers": ["звонки", "письма", "соц. сети", "напоминания"] },
-                      { "name": "Встречи", "triggers": ["назначить", "отменить", "посетить"] },
-                      { "name": "Предметы (взять/вернуть)", "triggers": ["предметы, взятые попользоваться", "инструменты", "книги/журналы", "деньги"] },
-                      { "name": "Путешествия", "triggers": ["поездки на выходные", "информация", "друзьям", "семье"] },
-                      { "name": "События", "triggers": ["торжества", "дни рождения"] },
-                      { "name": "Административная сфера", "triggers": ["финансы", "оплата счетов", "банки", "кредиты / платежи", "налоги", "страховки", "правовые вопросы", "завещания", "доверенности"] },
-                      { "name": "Ожидания (Личное)", "triggers": ["заказы по интернету/почте", "ремонт", "ответ на письма", "ответный звонок"] },
-                      { "name": "Дом", "triggers": ["отопление", "кондиционирование", "водопровод/канализация", "ремонт", "электричество", "мебель", "коммунальные службы", "платежи", "кухня", "санузел", "места для уборки (гараж, кладовка)"] },
-                      { "name": "Оборудование", "triggers": ["компьютер", "телевизор", "интернет"] },
-                      { "name": "Машина", "triggers": ["гараж", "страховка", "ремонт", "ТО", "Шины / колеса"] },
-                      { "name": "Гардероб", "triggers": ["свой", "супруги/супруга", "детей"] },
-                      { "name": "Здоровье", "triggers": ["фитнес", "стоматология", "посещения врача", "лекарства", "диета/питание"] },
-                      { "name": "Личное развитие", "triggers": ["семинары", "курсы", "самообразование", "статьи"] },
-                      { "name": "Домашние животные", "triggers": ["прививки", "корм", "оборудование"] },
-                      { "name": "Сообщество", "triggers": ["соседи", "школа", "детский сад", "церковь"] }
-                    ]
-                  }
-                ];
+            {
+                "category": "Учеба",
+                "subcategories": [
+                    { "name": "Домашнее задание", "triggers": ["Сделать", "Проверить", "Списать", "Передать"] },
+                    { "name": "Лекции / семинары", "triggers": ["Взять конспект", "Записаться"] },
+                    { "name": "Экзамены / зачеты", "triggers": ["Список вопросов", "Список литературы", "подготовиться"] },
+                    { "name": "Диплом / Курсовая", "triggers": ["Тема", "Рецензент", "Научрук"] },
+                    { "name": "Статьи / Конференции", "triggers": ["предложения", "встречи"] },
+                    { "name": "Практика", "triggers": ["-"] }
+                ]
+            },
+            {
+                "category": "Работа",
+                "subcategories": [
+                    { "name": "Проекты", "triggers": ["начатые проекты", "проекты, которые надо начать", "проекты, которые хорошо бы начать"] },
+                    { "name": "Обещания (Работа)", "triggers": ["начальник", "партнеры", "коллеги", "подчиненные", "клиенты"] },
+                    { "name": "Документы", "triggers": ["отчеты / таймшиты", "оценки", "обзоры", "редактирование", "вычитка"] },
+                    { "name": "Ожидания (Работа)", "triggers": ["информация", "проектные мероприятия", "ответы", "письма", "звонки"] },
+                    { "name": "Проф. рост", "triggers": ["обучение", "семинары", "ориентиры", "чему стоит поучиться", "нужные навыки"] },
+                    { "name": "Исследования", "triggers": ["-"] },
+                    { "name": "Профессиональный гардероб", "triggers": ["-"] }
+                ]
+            },
+            {
+                "category": "Личное",
+                "subcategories": [
+                    { "name": "Обещания (Личные)", "triggers": ["жене/мужу", "детям", "родителям", "друзьям", "родственникам"] },
+                    { "name": "Коммуникации", "triggers": ["звонки", "письма", "соц. сети", "напоминания"] },
+                    { "name": "Встречи", "triggers": ["назначить", "отменить", "посетить"] },
+                    { "name": "Предметы (взять/вернуть)", "triggers": ["предметы, взятые попользоваться", "инструменты", "книги/журналы", "деньги"] },
+                    { "name": "Путешествия", "triggers": ["поездки на выходные", "информация", "друзьям", "семье"] },
+                    { "name": "События", "triggers": ["торжества", "дни рождения"] },
+                    { "name": "Административная сфера", "triggers": ["финансы", "оплата счетов", "банки", "кредиты / платежи", "налоги", "страховки", "правовые вопросы", "завещания", "доверенности"] },
+                    { "name": "Ожидания (Личное)", "triggers": ["заказы по интернету/почте", "ремонт", "ответ на письма", "ответный звонок"] },
+                    { "name": "Дом", "triggers": ["отопление", "кондиционирование", "водопровод/канализация", "ремонт", "электричество", "мебель", "коммунальные службы", "платежи", "кухня", "санузел", "места для уборки (гараж, кладовка)"] },
+                    { "name": "Оборудование", "triggers": ["компьютер", "телевизор", "интернет"] },
+                    { "name": "Машина", "triggers": ["гараж", "страховка", "ремонт", "ТО", "Шины / колеса"] },
+                    { "name": "Гардероб", "triggers": ["свой", "супруги/супруга", "детей"] },
+                    { "name": "Здоровье", "triggers": ["фитнес", "стоматология", "посещения врача", "лекарства", "диета/питание"] },
+                    { "name": "Личное развитие", "triggers": ["семинары", "курсы", "самообразование", "статьи"] },
+                    { "name": "Домашние животные", "triggers": ["прививки", "корм", "оборудование"] },
+                    { "name": "Сообщество", "triggers": ["соседи", "школа", "детский сад", "церковь"] }
+                ]
+            }
+        ];
         // В реальном проекте вставьте сюда полный массив из v8.2!
-        
+
         wizardSubcategories = [];
         data.forEach(category => {
             category.subcategories.forEach(subcategory => {
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         });
-        
+
         const oldPrioritySelect = wizardElements.form.querySelector('.priority-select');
         if (oldPrioritySelect) oldPrioritySelect.remove();
         const newPrioritySelect = createPrioritySelect("4");
@@ -276,15 +276,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function showScreen(screenName) {
         Object.values(screens).forEach(screen => screen.style.display = 'none');
         Object.values(navButtons).forEach(btn => btn.classList.remove('active'));
-        
+
         if (screens[screenName]) screens[screenName].style.display = 'block';
         if (navButtons[screenName]) navButtons[screenName].classList.add('active');
-        
+
         if (screenName === 'inbox') renderInboxList();
         if (screenName === 'plan') renderPlanList();
         if (screenName === 'calendar') {
             renderCalendar();
-            const formattedDate = new Date(todayStr+'T00:00:00').toLocaleDateString('ru-RU');
+            const formattedDate = new Date(todayStr + 'T00:00:00').toLocaleDateString('ru-RU');
             renderCalendarTaskList(todayStr, `Задачи на ${formattedDate} (Сегодня)`);
         }
         if (screenName === 'wizard') {
@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const newTask = {
             text: text.trim(),
             priority: priority,
-            date: date, 
+            date: date,
             completed: false
         };
         addTaskToDB(newTask);
@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateTaskInDB(updatedTask);
         }
     }
-    
+
     function deleteTask(id) {
         deleteTaskFromDB(id);
     }
@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pauseTimer();
         currentTimerMode = mode;
         remainingTime = timerModes[mode];
-        
+
         focusElements.modeButtonsContainer.querySelectorAll('.timer-mode-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById(`timer-btn-${mode.replace('B', '-b')}`).classList.add('active');
         updateTimerDisplay();
@@ -347,25 +347,25 @@ document.addEventListener('DOMContentLoaded', () => {
     function startTimer() {
         // Запрашиваем разрешение на уведомления при первом старте
         requestNotificationPermission();
-        
+
         isTimerRunning = true;
         focusElements.startPauseBtn.textContent = 'Пауза';
-        
+
         timerInterval = setInterval(() => {
             remainingTime--;
             updateTimerDisplay();
-            
+
             if (remainingTime <= 0) {
                 handleTimerEnd();
             }
         }, 1000);
     }
-    
+
     function pauseTimer() {
         isTimerRunning = false;
         focusElements.startPauseBtn.textContent = 'Старт';
         clearInterval(timerInterval);
-        document.title = "Личный Секретарь"; 
+        document.title = "Личный Секретарь";
     }
 
     function resetTimer() {
@@ -377,15 +377,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleTimerEnd() {
         pauseTimer();
         focusElements.alarmSound.play().catch(e => console.log("Автоплей блокирован браузером"));
-        
+
         // Отправляем PUSH уведомление
         let notifTitle = "Таймер завершен!";
         let notifBody = "Пора сменить деятельность.";
-        
+
         if (currentTimerMode === 'pomodoro') {
             notifTitle = "Фокус завершен! 🍅";
             notifBody = "Время отдохнуть.";
-            
+
             if (activeFocusTaskId) {
                 const task = allTasks.find(t => t.id === activeFocusTaskId);
                 if (task) {
@@ -399,18 +399,18 @@ document.addEventListener('DOMContentLoaded', () => {
             notifTitle = "Перерыв окончен! ☕";
             notifBody = "Возвращаемся к работе.";
         }
-        
+
         sendNotification(notifTitle, notifBody);
 
         resetActiveFocusTask();
-        
+
         if (currentTimerMode === 'pomodoro') {
             setTimerMode('shortBreak');
         } else {
             setTimerMode('pomodoro');
         }
     }
-    
+
     function resetActiveFocusTask() {
         activeFocusTaskId = null;
         focusElements.taskDisplay.innerHTML = `<p>Нажмите на задачу из списка, чтобы выбрать ее.</p>`;
@@ -420,19 +420,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Функции Рендеринга (Слегка сокращены для v9.0, логика та же) ---
     function renderTaskList(targetListElement, tasks) {
         targetListElement.innerHTML = "";
-        
+
         if (tasks.length === 0) {
             // (Код заглушки Empty State из v8.2 - оставь его здесь)
-             targetListElement.innerHTML = `<div class="empty-state"><span class="icon">📝</span><h4>Пусто</h4><p>Нет задач</p></div>`;
+            targetListElement.innerHTML = `<div class="empty-state"><span class="icon">📝</span><h4>Пусто</h4><p>Нет задач</p></div>`;
             return;
         }
-        
+
         tasks.forEach(task => {
             const li = document.createElement('li');
             li.className = 'task-item';
             li.dataset.id = task.id;
             if (task.completed) li.classList.add('completed');
-            
+
             const prioritySelect = createPrioritySelect(task.priority);
             const dateInput = document.createElement('input');
             dateInput.type = 'datetime-local';
@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="task-controls"></div>
             `;
-            
+
             const controlsDiv = li.querySelector('.task-controls');
             controlsDiv.appendChild(prioritySelect);
             controlsDiv.appendChild(dateInput);
@@ -455,12 +455,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Inline edit logic
             const span = li.querySelector('.task-content span');
             span.addEventListener('click', () => {
-                if (targetListElement.id === 'focus-list') return; 
+                if (targetListElement.id === 'focus-list') return;
                 const currentText = span.textContent;
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.value = currentText;
-                input.className = 'task-edit-input'; 
+                input.className = 'task-edit-input';
                 span.replaceWith(input);
                 input.focus();
 
@@ -471,8 +471,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 input.addEventListener('blur', saveChanges);
                 input.addEventListener('keydown', (e) => {
-                     if (e.key === 'Enter') saveChanges();
-                     else if (e.key === 'Escape') input.replaceWith(span);
+                    if (e.key === 'Enter') saveChanges();
+                    else if (e.key === 'Escape') input.replaceWith(span);
                 });
             });
         });
@@ -507,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const month = currentDate.getMonth(), year = currentDate.getFullYear();
         const firstDayOfMonth = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const startDay = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1; 
+        const startDay = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
 
         document.querySelectorAll('.calendar-day.active-day').forEach(cell => { if (cell.dataset.date !== todayStr) cell.classList.remove('active-day'); });
         for (let i = 0; i < startDay; i++) calendarElements.grid.innerHTML += `<div class="calendar-day other-month"></div>`;
@@ -527,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
             calendarElements.grid.appendChild(cell);
         }
     }
-    
+
     function renderAllLists() {
         renderInboxList();
         renderPlanList();
@@ -535,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (screens.calendar.style.display === 'block') {
             const activeDay = document.querySelector('.calendar-day.active-day');
             const dateStr = activeDay ? activeDay.dataset.date : todayStr;
-            const formattedDate = new Date(dateStr+'T00:00:00').toLocaleDateString('ru-RU');
+            const formattedDate = new Date(dateStr + 'T00:00:00').toLocaleDateString('ru-RU');
             const title = dateStr === todayStr ? `Задачи на ${formattedDate} (Сегодня)` : `Задачи на ${formattedDate}`;
             renderCalendarTaskList(dateStr, title);
         }
@@ -570,7 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const text = wizardElements.taskInput.value.trim();
         const priority = wizardElements.form.querySelector('.priority-select').value;
-        const date = wizardElements.taskDate.value; 
+        const date = wizardElements.taskDate.value;
         if (text) {
             addTask(text, priority, date);
             const li = document.createElement('li'); li.textContent = `✅ ${text}`;
@@ -584,14 +584,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const taskText = inboxElements.input.value.trim();
         if (taskText) { addTask(taskText, "4", ""); inboxElements.input.value = ""; renderInboxList(); }
     });
-    
+
     appContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('delete-btn')) {
             const taskId = parseInt(e.target.closest('.task-item').dataset.id);
             if (confirm(`Удалить задачу?`)) deleteTask(taskId);
         }
     });
-    
+
     appContainer.addEventListener('change', (e) => {
         const taskItem = e.target.closest('.task-item');
         if (!taskItem) return;
@@ -599,24 +599,24 @@ document.addEventListener('DOMContentLoaded', () => {
         let newValues = {};
         if (e.target.classList.contains('task-checkbox')) newValues.completed = e.target.checked;
         if (e.target.classList.contains('priority-select')) newValues.priority = e.target.value;
-        if (e.target.type === 'datetime-local') newValues.date = e.target.value; 
+        if (e.target.type === 'datetime-local') newValues.date = e.target.value;
         if (Object.keys(newValues).length > 0) updateTask(taskId, newValues);
     });
 
     calendarNavButtons.prevMonth.onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); };
     calendarNavButtons.nextMonth.onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
-    
+
     calendarElements.grid.addEventListener('click', (e) => {
         const dayCell = e.target.closest('.calendar-day');
         if (dayCell && !dayCell.classList.contains('other-month')) {
             const dateStr = dayCell.dataset.date;
             document.querySelectorAll('.calendar-day.active-day').forEach(cell => cell.classList.remove('active-day'));
             dayCell.classList.add('active-day');
-            const formattedDate = new Date(dateStr+'T00:00:00').toLocaleDateString('ru-RU');
+            const formattedDate = new Date(dateStr + 'T00:00:00').toLocaleDateString('ru-RU');
             renderCalendarTaskList(dateStr, dateStr === todayStr ? `Задачи на ${formattedDate} (Сегодня)` : `Задачи на ${formattedDate}`);
         }
     });
-    
+
     focusElements.startPauseBtn.onclick = () => { isTimerRunning ? pauseTimer() : startTimer(); };
     focusElements.resetBtn.onclick = resetTimer;
     focusElements.btnPomodoro.onclick = () => setTimerMode('pomodoro');
@@ -642,4 +642,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimerMode('pomodoro');
     showScreen('inbox');
+
+    requestNotificationPermission();
+
+    // (НОВОЕ) Запускаем проверку задач каждую минуту (60 000 мс)
+    setInterval(checkScheduledTasks, 60000);
+    
+    // (НОВОЕ) И запускаем проверку сразу при старте (на случай перезагрузки страницы в нужную минуту)
+    setTimeout(checkScheduledTasks, 2000);    
+
+    function checkScheduledTasks() {
+        const now = new Date();
+        // Форматируем текущее время в строку "YYYY-MM-DDTHH:mm" (как в input type="datetime-local")
+        // Важно: учитываем смещение часового пояса
+        const offset = now.getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
+
+        // Ищем задачи, у которых время совпадает с текущим и они не выполнены
+        const tasksDue = allTasks.filter(t => t.date === localISOTime && !t.completed);
+
+        tasksDue.forEach(task => {
+            sendNotification("⏰ Напоминание", `Пора выполнить: ${task.text}`);
+
+            // Можно проиграть звук (если пользователь взаимодействовал со страницей)
+            focusElements.alarmSound.play().catch(e => console.log("Автоплей звука блокирован"));
+        });
+    }
+
 });
