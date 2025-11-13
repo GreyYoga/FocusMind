@@ -1,0 +1,415 @@
+/* CSS (Стили) - v8.2 "Cosmic" Dark Theme */
+:root {
+    --bg-color: #0d0f2b;
+    --card-bg: #1d1a3f;
+    --text-color: #f0f0f0;
+    --text-color-muted: #a0a0c0;
+    --border-color: #3a3f63;
+    --primary-color: #8f79d9;
+    --highlight-color: #FFEB3B;
+    --danger-color: #F44336;
+    --warn-color: #FFEB3B;
+    --info-color: #03A9F4;
+    --danger-light: #4a1c1c;
+    --warn-light: #4d4615;
+    --info-light: #0d3c5f;
+    --neutral-light: #3a3f63;
+}
+
+/* --- Общая структура --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0; padding: 0;
+    display: flex; flex-direction: column; min-height: 100vh;
+}
+.container {
+    flex: 1; width: 100%;
+    /* Отступ снизу, чтобы футер не перекрывал контент */
+    padding-bottom: 80px; 
+    box-sizing: border-box;
+}
+
+/* --- (НОВЫЙ) Мобильный Заголовок --- */
+.screen {
+    display: none;
+    /* Убираем внутренний отступ, он теперь в .screen-content */
+    padding: 0;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.screen-header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 20px;
+    /* Прилипает к верху */
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+.screen-header h2 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.2rem; /* Более мобильный размер */
+    text-align: left;
+}
+.screen-content {
+    padding: 15px;
+}
+
+#inbox-screen { display: block; }
+
+h3 {
+    margin-top: 20px; margin-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px; color: var(--text-color-muted);
+}
+
+/* --- Футер-Навигация --- */
+.footer-nav {
+    display: flex;
+    justify-content: space-around;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    position: sticky; bottom: 0;
+    width: 100%; padding: 10px 0; z-index: 100;
+}
+.nav-btn {
+    background: none; border: none; color: var(--text-color-muted); font-size: 0.75rem;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; flex: 1; cursor: pointer; padding: 5px 0;
+}
+.nav-btn .icon { font-size: 1.5rem; }
+.nav-btn.active { color: var(--primary-color); }
+#nav-focus .icon { color: var(--highlight-color); transition: transform 0.2s; }
+#nav-focus.active { color: var(--highlight-color); } /* (Изменено) */
+
+/* --- Форма быстрой задачи (в Инбоксе) --- */
+#add-task-form-inbox {
+    display: flex; gap: 10px; margin-bottom: 20px;
+}
+#add-task-form-inbox input[type="text"] {
+    flex: 1; padding: 12px; font-size: 1rem;
+    border: 1px solid var(--border-color); border-radius: 8px;
+    background: var(--card-bg); color: var(--text-color);
+}
+#add-task-form-inbox button {
+    padding: 12px 15px;
+    background: var(--primary-color);
+}
+
+/* --- (НОВЫЙ) Дизайн Карточки Задачи --- */
+.task-list-container { list-style: none; padding: 0; margin: 0; }
+.task-item {
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px; padding: 15px; margin-bottom: 10px;
+    /* (НОВОЕ) Для плавного выделения */
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.task-item.completed span { text-decoration: line-through; color: var(--text-color-muted); }
+
+.delete-btn {
+    position: absolute;
+    top: 5px; right: 5px;
+    background: none; border: none; color: var(--text-color-muted);
+    font-size: 1.3rem; cursor: pointer; padding: 5px;
+    opacity: 0.5;
+}
+.delete-btn:hover { opacity: 1; color: var(--danger-color); }
+
+.task-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-right: 30px; 
+}
+.task-content input[type="checkbox"] {
+    width: 20px; height: 20px;
+    accent-color: var(--highlight-color);
+}
+.task-content span {
+    font-size: 1.1em;
+    word-break: break-word;
+    flex: 1;
+    /* (ИЗМЕНЕНО) Добавляем курсор, чтобы намекнуть на редактирование */
+    cursor: pointer;
+}
+
+/* (НОВОЕ) Стили для инпута, который появляется при редактировании */
+.task-edit-input {
+    font-size: 1.1em;
+    flex: 1;
+    background: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+    padding: 5px;
+    margin: 0;
+}
+
+
+.task-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+    padding-left: 35px;
+}
+/* (НОВЫЙ) Стили для инпута времени */
+.priority-select, 
+.task-item input[type="date"],
+.task-item input[type="datetime-local"] {
+    flex: 1;
+    min-width: 150px;
+    box-sizing: border-box; border-radius: 8px;
+    padding: 10px; border: 1px solid var(--border-color);
+    font-size: 0.9em; background: var(--bg-color);
+    color: var(--text-color);
+}
+.priority-select[data-priority="1"] { border-color: var(--danger-color); background: var(--danger-light); }
+.priority-select[data-priority="2"] { border-color: var(--warn-color); background: var(--warn-light); }
+.priority-select[data-priority="3"] { border-color: var(--info-color); background: var(--info-light); }
+.priority-select[data-priority="4"] { border-color: var(--border-color); background: var(--bg-color); }
+
+/* (НОВЫЙ) Иконка календаря в темной теме */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8);
+}
+
+/* --- Стили Календаря --- */
+#calendar-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 15px;
+}
+#calendar-header h3 { margin: 0; font-size: 1.25rem; color: var(--text-color); }
+.calendar-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
+}
+#calendar-grid-header { margin-bottom: 5px; }
+.calendar-day-name {
+    font-weight: 600; text-align: center; padding: 5px;
+    font-size: 0.8em; color: var(--text-color-muted);
+}
+.calendar-day {
+    min-height: 70px; padding: 5px; border: 1px solid var(--border-color);
+    border-radius: 8px; background: var(--card-bg); font-size: 0.8em; cursor: pointer;
+    transition: background-color 0.2s;
+}
+.calendar-day.other-month { background: #07081a; color: #555; cursor: not-allowed; }
+.calendar-day:hover { background-color: var(--border-color); }
+.calendar-day.active-day { /* (НОВЫЙ) Выбранный день */
+    background-color: var(--primary-color);
+    color: #fff;
+}
+.calendar-day span { font-weight: 600; }
+.calendar-day .task-count { font-size: 0.9em; color: var(--text-color); margin-top: 5px; }
+.calendar-day.priority-1 { background-color: var(--danger-light); border-color: var(--danger-color); }
+.calendar-day.priority-2 { background-color: var(--warn-light); border-color: var(--warn-color); }
+.calendar-day.priority-3 { background-color: var(--info-light); border-color: var(--info-color); }
+.calendar-day.priority-4 { background-color: #2a2d4b; }
+
+#calendar-list-title {
+    display: block; /* Всегда видим */
+}
+#calendar-task-list {
+    list-style: none; padding: 0; margin-top: 20px;
+}
+/* Мы можем переиспользовать .task-item, поэтому спец. стили не нужны */
+.calendar-task-item-empty {
+    color: var(--text-color-muted);
+    text-align: center;
+    padding: 20px;
+}
+
+/* --- Стили Мастера (Визарда) --- */
+#wizard-header {
+    border-bottom: 1px solid var(--border-color); padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+#wizard-header h2 { margin: 0; color: var(--primary-color); font-size: 1.3rem; }
+#wizard-header p { margin: 5px 0 0; color: var(--text-color-muted); font-size: 0.9em; }
+.triggers p { font-weight: 600; margin-bottom: 10px; }
+.triggers ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.triggers li {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 15px; padding: 5px 12px;
+    font-size: 0.9em; color: var(--text-color-muted);
+}
+#wizard-task-form {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 15px; background: var(--card-bg); border-radius: 8px; margin-top: 20px;
+}
+#wizard-task-form input[type="text"],
+#wizard-task-form .priority-select,
+#wizard-task-form input[type="datetime-local"] {
+    width: 100%; box-sizing: border-box; padding: 12px;
+    font-size: 1rem; border: 1px solid var(--border-color);
+    background: var(--bg-color); color: var(--text-color); border-radius: 8px;
+}
+#wizard-step-tasks { list-style: none; padding: 0; margin-top: 15px; }
+#wizard-step-tasks li {
+    background: var(--bg-color); padding: 10px; border-radius: 5px;
+    margin-bottom: 5px; font-size: 0.9em; color: var(--text-color-muted);
+}
+        
+/* --- (НОВОЕ) Стили "Пустого Состояния" --- */
+.empty-state {
+    background: var(--card-bg);
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    color: var(--text-color-muted);
+    margin-top: 20px;
+}
+.empty-state .icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 10px;
+}
+.empty-state h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.2rem;
+    color: var(--text-color);
+}
+.empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+
+/* --- Общие элементы --- */
+.navigation {
+    display: flex; justify-content: space-between; align-items: center; margin-top: 20px;
+}
+button {
+    background: var(--primary-color); color: #fff; border: none; padding: 12px 20px;
+    border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; 
+    transition: background-color 0.2s, transform 0.2s;
+}
+button:hover { background: #a390e0; transform: scale(1.02); }
+button.secondary-btn { background: #6c757d; }
+button.secondary-btn:hover { background: #8a929a; }
+
+
+/* --- (НОВЫЕ) Стили Экрана "Фокус" --- */
+#timer-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+#timer-mode-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.timer-mode-btn {
+    flex: 1;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color-muted);
+    padding: 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+.timer-mode-btn.active {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+#timer-display {
+    font-size: 5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 20px;
+}
+#timer-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+#timer-controls #timer-start-pause {
+    min-width: 120px; /* Чтобы кнопка не прыгала */
+}
+#focus-task-container {
+    margin-top: 20px;
+}
+#focus-task-display {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    color: var(--text-color-muted);
+    font-style: italic;
+    min-height: 40px;
+}
+#focus-task-display p {
+    margin: 0;
+}
+#focus-task-display .active-task-text {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--highlight-color);
+}
+
+/* Стили для списка задач на экране Фокус */
+#focus-list .task-item {
+    cursor: pointer;
+}
+#focus-list .task-item .task-controls,
+#focus-list .task-item .delete-btn {
+    display: none; /* Скрываем управление, тут можно только выбрать */
+}
+#focus-list .task-item.activated {
+    border-color: var(--highlight-color);
+    background: #4d4615; /* warn-light */
+}
+#focus-list .task-item.completed {
+    /* (Изменено) Делаем завершенные задачи неактивными */
+    opacity: 0.5;
+    background: var(--bg-color);
+    cursor: not-allowed;
+}
+
+
+/* --- Адаптивность для Десктопа --- */
+@media (min-width: 768px) {
+    .screen-header { padding: 15px 30px; }
+    .screen-content { padding: 25px 30px; }
+    h2 { font-size: 1.8rem; }
+    /* Карточка задачи на десктопе */
+    .task-controls { flex-wrap: nowrap; }
+    .priority-select, 
+    .task-item input[type="date"],
+    .task-item input[type="datetime-local"] {
+        flex: none; width: auto;
+    }
+    .task-content span { min-width: 200px; }
+    
+    .calendar-day { min-height: 100px; padding: 8px; }
+    
+    #wizard-task-form {
+        flex-direction: row; align-items: center;
+    }
+    #wizard-task-form input[type="text"] { flex: 1; }
+    #wizard-task-form .priority-select,
+    #wizard-task-form input[type="datetime-local"],
+    #wizard-task-form button { width: auto; }
+
+    /* (НОВОЕ) Адаптивность Фокуса */
+    #timer-display {
+        font-size: 7rem;
+    }
+    .timer-mode-btn {
+        font-size: 1rem;
+    }
+}

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1a3f">
+    <title>Личный Секретарь PWA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="inbox-screen" class="screen">
+            <div class="screen-header"><h2>🗃️ Инбокс (Необработанные)</h2></div>
+            <div class="screen-content">
+                <form id="add-task-form-inbox">
+                    <input type="text" id="new-task-input" placeholder="Собрать... Позвонить... Написать..." required>
+                    <button type="submit">+</button>
+                </form>
+                <h3>Задачи без даты:</h3>
+                <ul id="inbox-list" class="task-list-container"></ul>
+            </div>
+        </div>
+        
+        <div id="plan-screen" class="screen">
+            <div class="screen-header"><h2>📋 План (Задачи с датой)</h2></div>
+            <div class="screen-content">
+                <h3>Задачи с установленной датой:</h3>
+                <ul id="plan-list" class="task-list-container"></ul>
+            </div>
+        </div>
+
+        <div id="calendar-screen" class="screen">
+            <div class="screen-header"><h2>📅 Календарь</h2></div>
+            <div class="screen-content">
+                <div id="calendar-header">
+                    <button id="prev-month-btn" class="secondary-btn">&lt;</button>
+                    <h3 id="month-year-title">Ноябрь 2025</h3>
+                    <button id="next-month-btn" class="secondary-btn">&gt;</button>
+                </div>
+                <div id="calendar-grid-header" class="calendar-grid">
+                    <div class="calendar-day-name">Пн</div> <div class="calendar-day-name">Вт</div>
+                    <div class="calendar-day-name">Ср</div> <div class="calendar-day-name">Чт</div>
+                    <div class="calendar-day-name">Пт</div> <div class="calendar-day-name">Сб</div>
+                    <div class="calendar-day-name">Вс</div>
+                </div>
+                <div id="calendar-grid" class="calendar-grid"></div>
+
+                <h3 id="calendar-list-title">Задачи на сегодня:</h3>
+                <ul id="calendar-task-list" class="task-list-container"></ul>
+            </div>
+        </div>
+
+        <div id="wizard-screen" class="screen">
+            <div class="screen-header"><h2>✨ Очистка Мозга</h2></div>
+            <div class="screen-content">
+                <div id="wizard-header">
+                    <h2 id="category-title">Категория</h2>
+                    <p id="subcategory-title">Подкатегория</p>
+                </div>
+                <div class="triggers">
+                    <p>Триггеры:</p>
+                    <ul id="triggers-list"></ul>
+                </div>
+                <h3>Добавить задачу по этой теме:</h3>
+                <form id="wizard-task-form">
+                    <input type="text" id="wizard-task-input" placeholder="Прочитать... Подготовить..." required>
+                    <input type="datetime-local" id="wizard-task-datetime">
+                    <button type="submit">Добавить</button>
+                </form>
+                <ul id="wizard-step-tasks"></ul>
+                <div class="navigation">
+                    <button id="prev-btn" class="secondary-btn">Назад</button>
+                    <span id="step-counter">Шаг 1 / N</span>
+                    <button id="next-btn">Далее</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="focus-screen" class="screen">
+            <div class="screen-header"><h2>⏱️ Фокус (Pomodoro)</h2></div>
+            <div class="screen-content">
+                <div id="timer-container">
+                    <div id="timer-mode-buttons">
+                        <button id="timer-btn-pomodoro" class="timer-mode-btn active">Фокус (25)</button>
+                        <button id="timer-btn-short-break" class="timer-mode-btn">Пауза (5)</button>
+                        <button id="timer-btn-long-break" class="timer-mode-btn">Перерыв (15)</button>
+                    </div>
+                    <div id="timer-display">25:00</div>
+                    <div id="timer-controls">
+                        <button id="timer-start-pause">Старт</button>
+                        <button id="timer-reset" class="secondary-btn">Сброс</button>
+                    </div>
+                </div>
+                <div id="focus-task-container">
+                    <h3>Текущая задача:</h3>
+                    <div id="focus-task-display">
+                        <p>Нажмите на задачу из списка, чтобы выбрать ее.</p>
+                    </div>
+                    <h3>Задачи на сегодня:</h3>
+                    <ul id="focus-list" class="task-list-container"></ul>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <nav class="footer-nav">
+        <button id="nav-inbox" class="nav-btn active">
+            <span class="icon">🗃️</span>
+            <span>Инбокс</span>
+        </button>
+        <button id="nav-plan" class="nav-btn">
+            <span class="icon">📋</span>
+            <span>План</span>
+        </button>
+        <button id="nav-calendar" class="nav-btn">
+            <span class="icon">📅</span>
+            <span>Календарь</span>
+        </button>
+        <button id="nav-wizard" class="nav-btn">
+            <span class="icon">✨</span>
+            <span>Триггеры</span>
+        </button>
+        <button id="nav-focus" class="nav-btn">
+            <span class="icon">⏱️</span>
+            <span>Фокус</span>
+        </button>
+    </nav>
+
+    <audio id="alarm-sound" src="alarm.mp3" preload="auto"></audio>
+
+    <script src="app.js"></script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker зарегистрирован', reg))
+                    .catch(err => console.log('Ошибка SW:', err));
+            });
+        }
+    </script>
+</body>
+</html>
