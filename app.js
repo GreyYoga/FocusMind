@@ -647,9 +647,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // (НОВОЕ) Запускаем проверку задач каждую минуту (60 000 мс)
     setInterval(checkScheduledTasks, 60000);
-    
+
     // (НОВОЕ) И запускаем проверку сразу при старте (на случай перезагрузки страницы в нужную минуту)
-    setTimeout(checkScheduledTasks, 2000);    
+    setTimeout(checkScheduledTasks, 2000);
 
     function checkScheduledTasks() {
         const now = new Date();
@@ -668,5 +668,18 @@ document.addEventListener('DOMContentLoaded', () => {
             focusElements.alarmSound.play().catch(e => console.log("Автоплей звука блокирован"));
         });
     }
+
+    document.getElementById('test-notif-btn').onclick = () => {
+        // 1. Запрашиваем права
+        Notification.requestPermission().then(perm => {
+            if (perm === "granted") {
+                // 2. Пробуем отправить
+                sendNotification("Тест работает!", "Если вы это читаете, значит права есть.");
+                document.getElementById('alarm-sound').play();
+            } else {
+                alert("Ошибка! Права на уведомления: " + perm);
+            }
+        });
+    };
 
 });
