@@ -670,44 +670,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('test-notif-btn').onclick = () => {
-        // 1. Проверяем, поддерживает ли браузер уведомления
+        // 1. Проверка поддержки
+        if (!('serviceWorker' in navigator)) {
+            alert("❌ Браузер не поддерживает Service Worker!");
+            return;
+        }
         if (!('Notification' in window)) {
-            alert("❌ Этот браузер вообще не поддерживает уведомления!");
+            alert("❌ Браузер не поддерживает уведомления!");
             return;
         }
 
-        // 2. Проверяем текущий статус прав
-        alert("🔍 Текущий статус прав: " + Notification.permission);
-
-        // 3. Запрашиваем права
-        Notification.requestPermission().then(permission => {
-            // 4. Сообщаем результат запроса
-            alert("📝 Результат запроса прав: " + permission);
-
-            if (permission === "granted") {
-                // 5. Пробуем отправить через Service Worker (это важно для Android!)
-                if (navigator.serviceWorker.controller) {
-                    alert("⚙️ Service Worker найден, отправляем...");
-
-                    navigator.serviceWorker.ready.then(registration => {
-                        registration.showNotification("🔔 Тест PWA", {
-                            body: "Ура! Если ты это видишь — всё работает.",
-                            icon: 'icon-192.png', // Убедись, что картинка есть!
-                            vibrate: [200, 100, 200]
-                        }).then(() => {
-                            alert("✅ Команда на отправку ушла!");
-                        }).catch(err => {
-                            alert("❌ Ошибка отправки: " + err);
-                        });
-                    });
-                } else {
-                    alert("⚠️ Service Worker не активен! Уведомления PWA требуют SW.");
-                    // Попытка обычного уведомления (фоллбэк)
-                    new Notification("Обычное уведомление", { body: "Без SW" });
-                }
+        // 2. Запрос прав
+        Notification.requestPermission().then(perm => {
+            if (perm !== 'granted') {
+                alert("🔒 Права на уведомления не даны (статус: " + perm + ")");
+                return;
             }
-        }).catch(err => {
-            alert("❌ Ошибка в процессе запроса: " + err);
+
+            alert("✅ Права есть. Ждем Service Worker...");
+
+            // 3. МАГИЯ: Мы не проверяем controller, мы просто ждем, пока SW будет ГОТОВ.
+            navigator.serviceWorker.ready.then(registration => {
+                alert("⚙️ SW готов! Отправляем...");
+
+                registration.showNotification("🔔 Победа!", {
+                    body: "Уведомления через Service Worker работают!",
+                    icon: 'icon-192.png',
+                    vibrate: [200, 100, 200],
+                    tag: 'test-notification'
+                })
+                    .then(() => {
+                        // Воспроизводим звук для проверки
+                        const audio = document.getElementById('alarm-sound');
+                        if (audio) audio.play().catch(e => console.log("Звук не сработал (нужен тап)"));
+                    })
+                    .catch(err => alert("❌ Ошибка внутри showNotification: " + err));
+
+            }).catch(err => {
+                alert("❌ Ошибка ожидания SW (ready): " + err);
+                console.error(err);
+            });
         });
     };
 

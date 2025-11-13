@@ -1,4 +1,4 @@
-const CACHE_NAME = 'secretary-v3'; // ОБЯЗАТЕЛЬНО МЕНЯЕМ ВЕРСИЮ
+const CACHE_NAME = 'secretary-v4'; // ОБЯЗАТЕЛЬНО МЕНЯЕМ ВЕРСИЮ
 const ASSETS = [
   './',
   './index.html',
